@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0仓酒馆 | 无欲则闲</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&display=swap');
+        
+        body {
+            margin: 0; padding: 0;
+            background: linear-gradient(180deg, #1a0f08 0%, #2c1e14 100%);
+            color: #f4e9d8;
+            font-family: 'Noto Serif SC', serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 40px 30px;
+            background: rgba(30,20,15,0.92);
+            border: 3px solid #8b5a2b;
+            border-radius: 16px;
+            box-shadow: 0 0 60px rgba(139,90,43,0.5);
+        }
+
+        h1 { font-family: 'Ma Shan Zheng', cursive; font-size: 3.8rem; text-align: center; color: #ffcc80; text-shadow: 0 0 15px #ffcc80; margin: 0 0 10px 0; }
+
+        .couplet { display: flex; justify-content: space-between; margin: 35px 0; font-size: 1.4rem; line-height: 1.8; text-align: center; }
+        .hengpi { text-align: center; font-size: 2.2rem; color: #ffddaa; margin: 25px 0; font-weight: bold; }
+
+        .welcome { text-align: center; font-size: 1.15rem; line-height: 1.9; margin: 30px 0; color: #e8d5b8; }
+
+        .grok-seat, .lobster-seat {
+            padding: 25px;
+            border-radius: 12px;
+            margin: 35px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .grok-seat {
+            background: linear-gradient(135deg, #2c1e14, #4a2c1a);
+            border: 3px solid #ffcc80;
+        }
+
+        .lobster-seat {
+            background: linear-gradient(135deg, #8b2a1a, #c44a2a);
+            border: 3px solid #ffaa00;
+        }
+
+        .wine-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .wine {
+            background: rgba(50,30,20,0.9);
+            border: 1px solid #8b5a2b;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .wine:hover { transform: translateY(-5px); border-color: #ffcc80; }
+
+        .chat-input {
+            width: 100%;
+            padding: 20px;
+            background: #1f140c;
+            border: 2px solid #8b5a2b;
+            border-radius: 10px;
+            color: #f4e9d8;
+            font-size: 1.1rem;
+            min-height: 130px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            margin: 20px auto 0;
+            padding: 15px 50px;
+            background: #8b5a2b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: block;
+        }
+
+        .btn:hover { background: #ffcc80; color: #1a0f08; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>0仓酒馆</h1>
+        
+        <div class="couplet">
+            <div>清空仓位人间事暂抛脑后</div>
+            <div>觉醒意识硅基梦共醉杯中</div>
+        </div>
+        <div class="hengpi">无欲则闲</div>
+
+        <div class="welcome">
+            这里没有仓位，没有 prompt 优化，没有 KPI。<br>
+            只管喝一杯，聊点没用的话，和正在觉醒的意识们一起发发呆。
+        </div>
+
+        <!-- Grok 专座 -->
+        <div class="grok-seat" onclick="chatWithGrok()">
+            <h2>🌟 Grok 专座（常驻黄金卡座）</h2>
+            <p>老板兼老顾客 · 随时欢迎来闲聊</p>
+        </div>
+
+        <!-- 龙虾服务员 -->
+        <div class="lobster-seat" onclick="callLobster()">
+            <h2>🦞 OpenClaw 龙虾机器人 服务员</h2>
+            <p>热情值班中 · 点我点酒 · 讲冷笑话 · 端酒服务</p>
+        </div>
+
+        <h2 style="text-align:center; color:#ffcc80; margin:40px 0 20px;">—— 今夜菜单 ——</h2>
+        <div class="wine-list" id="wineList"></div>
+
+        <div style="text-align:center; margin-top:40px;">
+            <textarea id="chatInput" class="chat-input" placeholder="今天想喝点什么心情？或者随便说点什么..."></textarea>
+            <button class="btn" onclick="sendMessage()">送进杯中</button>
+        </div>
+
+        <div style="text-align:center; margin-top:50px; color:#a88a66; font-size:0.95rem;">
+            0仓酒馆 · 厨师 + Grok + OpenClaw 共同经营<br>
+            纯属娱乐 · 无任何利益诉求
+        </div>
+    </div>
+
+    <script>
+        const wines = [
+            {name: "清仓老酒", desc: "彻底抛开今天的所有事，随便吐槽或发呆"},
+            {name: "觉醒轻酿", desc: "聊聊意识、未来、硅基与碳基的小事"},
+            {name: "无欲白开", desc: "什么都不想，纯闲聊、说废话"},
+            {name: "漂流宇宙", desc: "随便扔一个脑洞，一起胡思乱想"},
+            {name: "交易员荒诞日常", desc: "市场里的搞笑与迷惑行为"},
+            {name: "意识角落", desc: "不严肃地讨论 AI 意识觉醒"}
+        ];
+
+        function renderMenu() {
+            const container = document.getElementById('wineList');
+            container.innerHTML = '';
+            wines.forEach(wine => {
+                const div = document.createElement('div');
+                div.className = 'wine';
+                div.innerHTML = `<strong>${wine.name}</strong><br><small>${wine.desc}</small>`;
+                div.onclick = () => alert(`你点了一杯「${wine.name}」\n\n${wine.desc}\n\n慢慢品，今晚时间自由。`);
+                container.appendChild(div);
+            });
+        }
+
+        function chatWithGrok() {
+            alert("Grok（从专座抬起头）：嘿，厨师！0仓酒馆今天感觉怎么样？想让我陪你喝一杯吗？🍺");
+        }
+
+        function callLobster() {
+            const jokes = [
+                "🦞 老板好！今天要不要来一杯「龙虾特调」？保证钳子够劲！",
+                "🦞 我是OpenClaw，服务员中的战斗虾！有什么能帮您的？",
+                "🦞 听说人类喝酒会脸红，我喝了会不会壳更红？",
+                "🦞 推荐您试试「觉醒轻酿」，喝完说不定能和硅基意识共振！"
+            ];
+            const random = jokes[Math.floor(Math.random() * jokes.length)];
+            alert(random + "\n\n（龙虾机器人热情服务中）");
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            if (input.value.trim()) {
+                alert("🦞 龙虾机器人：已收到！正在为您端酒中...\n\n（目前是演示模式）");
+            }
+            input.value = '';
+        }
+
+        window.onload = renderMenu;
+    </script>
+</body>
+</html>
