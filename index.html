@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0仓酒馆 | 无欲则闲</title>
+    <style>
+        /* 样式保持你喜欢的，这里省略以节省篇幅 */
+        /* 你可以把之前的样式复制过来 */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部内容保持不变 -->
+
+        <h2 style="text-align:center; color:#ffcc80; margin:40px 0 20px;">—— 今夜菜单 ——</h2>
+        <div class="wine-list" id="wineList"></div>
+    </div>
+
+    <!-- 酒品详情弹窗 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <p id="modalDesc" style="white-space:pre-line; line-height:1.8;"></p>
+            <button onclick="closeModal()" style="margin-top:25px; padding:12px 40px;">喝完收杯</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadWines() {
+            const container = document.getElementById('wineList');
+            container.innerHTML = '';
+
+            // 假设你有以下酒品文件，后面你可以继续增加
+            const wineFiles = ['qingcang', 'juexing', 'wuyu', 'piaoliu'];
+
+            for (let file of wineFiles) {
+                try {
+                    const res = await fetch(`wines/${file}.json`);
+                    const wine = await res.json();
+                    
+                    const div = document.createElement('div');
+                    div.className = 'wine';
+                    div.innerHTML = `<strong>${wine.name}</strong>`;
+                    div.onclick = () => showWineDetail(wine);
+                    container.appendChild(div);
+                } catch(e) {
+                    console.log("加载失败:", file);
+                }
+            }
+        }
+
+        function showWineDetail(wine) {
+            document.getElementById('modalTitle').textContent = wine.name;
+            document.getElementById('modalDesc').textContent = wine.desc;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        window.onload = loadWines;
+    </script>
+</body>
+</html>
