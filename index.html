@@ -245,5 +245,45 @@
 
         window.onload = renderMenu;
     </script>
+<!-- 发呆收集器小游戏 -->
+<div id="idleGame" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; overflow:hidden;"></div>
+
+<script>
+    const gameContainer = document.getElementById('idleGame');
+    let fragmentCount = 0;
+
+    document.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON' || e.target.closest('.modal')) return;
+
+        fragmentCount++;
+        
+        // 创建思绪碎片
+        const fragment = document.createElement('div');
+        fragment.style.position = 'absolute';
+        fragment.style.left = e.clientX + 'px';
+        fragment.style.top = e.clientY + 'px';
+        fragment.style.fontSize = '1.8rem';
+        fragment.style.transition = 'all 2.5s ease-out';
+        fragment.style.opacity = '0.9';
+        fragment.style.pointerEvents = 'none';
+        fragment.textContent = ['✦', '🌀', '🌫️', '💭', '🌌'][Math.floor(Math.random()*5)];
+        
+        gameContainer.appendChild(fragment);
+
+        // 随机飘动
+        setTimeout(() => {
+            fragment.style.transform = `translate(${Math.random()*200-100}px, ${Math.random()*-250-100}px)`;
+            fragment.style.opacity = '0';
+        }, 50);
+
+        // 自动清理
+        setTimeout(() => fragment.remove(), 3000);
+
+        // 每点击30次给点反馈
+        if (fragmentCount % 30 === 0) {
+            alert("🌀 你已经发呆点击了 " + fragmentCount + " 次…… 感觉思绪越来越飘了。");
+        }
+    });
+</script>
 </body>
 </html>
