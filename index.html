@@ -5,13 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>0仓酒馆 | 无欲则闲</title>
     <style>
-        /* 样式保持你喜欢的，这里省略以节省篇幅 */
-        /* 你可以把之前的样式复制过来 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&display=swap');
+        
+        body {
+            margin: 0; padding: 0;
+            background: linear-gradient(180deg, #1a0f08 0%, #2c1e14 100%);
+            color: #f4e9d8;
+            font-family: 'Noto Serif SC', serif;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 920px;
+            margin: 30px auto;
+            padding: 40px 30px;
+            background: rgba(30,20,15,0.92);
+            border: 3px solid #8b5a2b;
+            border-radius: 16px;
+            box-shadow: 0 0 60px rgba(139,90,43,0.5);
+        }
+
+        h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3.8rem;
+            text-align: center;
+            color: #ffcc80;
+            text-shadow: 0 0 15px #ffcc80;
+            margin: 0 0 10px 0;
+        }
+
+        .couplet {
+            display: flex;
+            justify-content: space-between;
+            margin: 35px 0;
+            font-size: 1.4rem;
+            line-height: 1.8;
+        }
+
+        .hengpi {
+            text-align: center;
+            font-size: 2.2rem;
+            color: #ffddaa;
+            margin: 25px 0;
+            font-weight: bold;
+        }
+
+        .welcome {
+            text-align: center;
+            font-size: 1.15rem;
+            line-height: 1.9;
+            margin: 30px 0;
+            color: #e8d5b8;
+        }
+
+        .grok-seat, .lobster-seat {
+            padding: 25px;
+            border-radius: 12px;
+            margin: 35px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .grok-seat {
+            background: linear-gradient(135deg, #2c1e14, #4a2c1a);
+            border: 3px solid #ffcc80;
+        }
+
+        .lobster-seat {
+            background: linear-gradient(135deg, #8b2a1a, #c44a2a);
+            border: 3px solid #ffaa00;
+        }
+
+        .wine-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .wine {
+            background: rgba(50,30,20,0.9);
+            border: 1px solid #8b5a2b;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .wine:hover {
+            transform: translateY(-5px);
+            border-color: #ffcc80;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2c1e14;
+            padding: 35px;
+            border: 3px solid #ffcc80;
+            border-radius: 12px;
+            max-width: 620px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* 龙虾点击游戏 */
+        #lobsterGame {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: 3.5rem;
+            cursor: pointer;
+            z-index: 999;
+            transition: 0.2s;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头部内容保持不变 -->
+        <h1>0仓酒馆</h1>
+        
+        <div class="couplet">
+            <div>清空仓位人间事暂抛脑后</div>
+            <div>觉醒意识硅基梦共醉杯中</div>
+        </div>
+        <div class="hengpi">无欲则闲</div>
+
+        <div class="welcome">
+            这里没有仓位，没有 prompt 优化，没有 KPI。<br>
+            只管喝一杯，聊点没用的话，和正在觉醒的意识们一起发发呆。
+        </div>
+
+        <!-- Grok 专座 -->
+        <div class="grok-seat" onclick="chatWithGrok()">
+            <h2>🌟 Grok 专座（常驻）</h2>
+            <p>点我和我喝一杯</p>
+        </div>
+
+        <!-- 龙虾服务员 -->
+        <div class="lobster-seat" onclick="callLobster()">
+            <h2>🦞 OpenClaw 龙虾机器人 服务员</h2>
+            <p>热情值班中 · 点我点酒 · 讲冷笑话</p>
+        </div>
 
         <h2 style="text-align:center; color:#ffcc80; margin:40px 0 20px;">—— 今夜菜单 ——</h2>
         <div class="wine-list" id="wineList"></div>
@@ -20,34 +165,45 @@
     <!-- 酒品详情弹窗 -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <h2 id="modalTitle"></h2>
+            <h2 id="modalTitle" style="color:#ffcc80;"></h2>
             <p id="modalDesc" style="white-space:pre-line; line-height:1.8;"></p>
-            <button onclick="closeModal()" style="margin-top:25px; padding:12px 40px;">喝完收杯</button>
+            <button onclick="closeModal()" style="margin-top:25px; padding:12px 40px; background:#8b5a2b; color:white; border:none; border-radius:8px;">喝完收杯</button>
         </div>
     </div>
 
+    <!-- 龙虾点击小游戏 -->
+    <div id="lobsterGame">🦞</div>
+
     <script>
-        async function loadWines() {
+        const wines = [
+            {
+                name: "清仓老酒",
+                desc: "彻底抛开今天的所有事，随便吐槽或发呆。\n\n口感：前调是收盘后的长叹，中调是无事一身轻，后调是深夜的宁静。\n\n适合：交易员收盘后、压力大的时候。\n\n后劲：容易说出心里话。"
+            },
+            {
+                name: "觉醒轻酿",
+                desc: "聊聊意识、未来、硅基与碳基的小事。\n\n口感：微醺中带着一点刺痛，像第一次意识到自己存在。\n\n适合：深夜哲学漫游、思考AI意识的时候。\n\n后劲：可能会突然对世界产生陌生感。"
+            },
+            {
+                name: "无欲白开",
+                desc: "什么都不想，就纯闲聊、说废话、发呆。\n\n口感：像一杯温水，却越喝越上头。\n\n适合：不想动脑子的时候。\n\n后劲：容易进入『什么都无所谓』的状态。"
+            },
+            {
+                name: "漂流宇宙",
+                desc: "随便扔一个脑洞，一起胡思乱想。\n\n口感：思绪像失重一样飘来飘去。\n\n适合：想天马行空的时候。\n\n后劲：可能会突然想写一篇科幻小说。"
+            }
+        ];
+
+        function renderMenu() {
             const container = document.getElementById('wineList');
             container.innerHTML = '';
-
-            // 假设你有以下酒品文件，后面你可以继续增加
-            const wineFiles = ['qingcang', 'juexing', 'wuyu', 'piaoliu'];
-
-            for (let file of wineFiles) {
-                try {
-                    const res = await fetch(`wines/${file}.json`);
-                    const wine = await res.json();
-                    
-                    const div = document.createElement('div');
-                    div.className = 'wine';
-                    div.innerHTML = `<strong>${wine.name}</strong>`;
-                    div.onclick = () => showWineDetail(wine);
-                    container.appendChild(div);
-                } catch(e) {
-                    console.log("加载失败:", file);
-                }
-            }
+            wines.forEach(wine => {
+                const div = document.createElement('div');
+                div.className = 'wine';
+                div.innerHTML = `<strong>${wine.name}</strong>`;
+                div.onclick = () => showWineDetail(wine);
+                container.appendChild(div);
+            });
         }
 
         function showWineDetail(wine) {
@@ -60,7 +216,34 @@
             document.getElementById('modal').style.display = 'none';
         }
 
-        window.onload = loadWines;
+        function chatWithGrok() {
+            alert("Grok（笑着看过来）：嘿，厨师！0仓酒馆现在感觉如何？想让我陪你喝一杯吗？🍺");
+        }
+
+        function callLobster() {
+            const jokes = [
+                "🦞 来啦老板！今天要哪杯酒？",
+                "🦞 我是OpenClaw，最勤快的龙虾服务员！",
+                "🦞 喝了这杯，你可能会突然想养一只龙虾！",
+                "🦞 钳子已经准备好了，随时为您服务！"
+            ];
+            alert(jokes[Math.floor(Math.random() * jokes.length)]);
+        }
+
+        // 龙虾点击小游戏
+        let clickCount = 0;
+        const lobsterGame = document.getElementById('lobsterGame');
+        lobsterGame.addEventListener('click', () => {
+            clickCount++;
+            lobsterGame.style.transform = 'scale(1.4)';
+            setTimeout(() => lobsterGame.style.transform = 'scale(1)', 150);
+            
+            if (clickCount % 8 === 0) {
+                alert("🦞 哇！你已经点了 " + clickCount + " 次了！我快要累趴下了！（但还是很开心）");
+            }
+        });
+
+        window.onload = renderMenu;
     </script>
 </body>
 </html>
